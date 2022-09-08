@@ -11,7 +11,7 @@ psql (13.6)
 ```
 
 
-Find installed verson
+Find installed verson and get location of posgresql libraries and includes
 ```
 rpm -qa | grep postgres
 rpm -ql postgresql13-devel-13.6
