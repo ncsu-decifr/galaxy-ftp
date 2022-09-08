@@ -31,3 +31,12 @@ sudo make install
 find in galaxy.yml for conneciton info
 
 database_connection: 'postgresql://galaxy:mypassword@127.0.0.1/galaxydb'
+
+login as user runnig galaxy and get users id and group id 
+
+```
+id -u
+id -g
+
+```
+
