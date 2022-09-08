@@ -28,3 +28,6 @@ make
 sudo make install
 
 ```
+find in galaxy.yml for conneciton info
+
+database_connection: 'postgresql://galaxy:<password>@127.0.0.1/galaxydb'
