@@ -40,3 +40,19 @@ id -g
 
 ```
 
+```
+[postgres@vclvm178-23 jbwhite2]$ createuser -SDR galaxyftp
+[postgres@vclvm178-23 jbwhite2]$ psql
+psql (13.6)
+Type "help" for help.
+
+postgres=# \c galaxydb 
+You are now connected to database "galaxydb" as user "postgres".
+galaxydb=# ALTER ROLE galaxyftp PASSWORD 'ftppassword';
+ALTER ROLE
+galaxydb=# GRANT SELECT ON galaxy_user TO galaxyftp; 
+GRANT
+galaxydb=# 
+
+```
+
