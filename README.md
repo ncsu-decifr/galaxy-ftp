@@ -18,9 +18,13 @@ rpm -ql postgresql13-devel-13.6
 ```
 
 get proftpd code
+configure --enable-ident can be used for testing 
 
 ```
 wget https://github.com/proftpd/proftpd/archive/refs/tags/v1.3.7e.tar.gz
 
-./configure --disable-auth-file --disable-ncurses --disable-ident --disable-shadow --enable-openssl --with-modules=mod_sql:mod_sql_postgres:mod_sql_passwd --with-includes=/usr/pgsql-13/include:`pwd`/../openssl/.openssl/include --with-libraries=/usr/pgsql-13/lib:`pwd`/../openssl/.openssl/lib --with-postgres-config=/usr/pgsql-13/bin
+./configure  --enable-openssl --with-modules=mod_sql:mod_sql_postgres:mod_sql_passwd:mod_tls --with-includes=/usr/pgsql-13/include:/usr/include/openssl --with-libraries=/usr/pgsql-13/lib:/usr/lib64/ --with-postgres-config=/usr/pgsql-13/bin
+make
+sudo make install
+
 ```
