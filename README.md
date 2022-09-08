@@ -12,7 +12,10 @@ psql (13.6)
 
 
 Find installed verson
+```
 rpm -qa | grep postgres
+rpm -ql postgresql13-devel-13.6
+```
 
 get proftpd code
 
