@@ -28,15 +28,11 @@ make
 sudo make install
 
 ```
-find in galaxy.yml for conneciton info
-
-database_connection: 'postgresql://galaxy:mypassword@127.0.0.1/galaxydb'
-
-login as user runnig galaxy and get users id and group id 
+Get ids for user to run ftp server. 
 
 ```
-id -u
-id -g
+grep galaxy /etc/passwd
+galaxy:x:58413:58413::/home/galaxy:/bin/bash
 
 ```
 
@@ -53,6 +49,101 @@ ALTER ROLE
 galaxydb=# GRANT SELECT ON galaxy_user TO galaxyftp; 
 GRANT
 galaxydb=# 
+
+```
+Copy config to /usr/local/etc/proftpd.conf
+
+```
+# Basics, some site-specific
+ServerName                      "Public Galaxy FTP"
+ServerType                      standalone
+DefaultServer                   on
+Port                            21
+Umask                           077
+SyslogFacility                  DAEMON
+SyslogLevel                     debug
+MaxInstances                    30
+
+# This User & Group should be set to the actual user and group name which matche the UID & GID you will specify later in the SQLNamedQuery.
+User                            galaxy
+Group                           galaxy
+DisplayConnect                  /etc/local/proftpd/welcome.txt
+
+# Passive port range for the firewall
+PassivePorts                    30000 40000
+
+# Cause every FTP user to be "jailed" (chrooted) into their home directory
+DefaultRoot                     ~
+
+# Automatically create home directory if it doesn't exist
+CreateHome                      on dirmode 700
+
+# Allow users to overwrite their files
+AllowOverwrite                  on
+
+# Allow users to resume interrupted uploads
+AllowStoreRestart               on
+
+# Bar use of SITE CHMOD
+<Limit SITE_CHMOD>
+    DenyAll
+</Limit>
+
+# Bar use of RETR (download) since this is not a public file drop
+<Limit RETR>
+    DenyAll
+</Limit>
+
+# Do not authenticate against real (system) users
+<IfModule mod_auth_pam.c>
+AuthPAM                         off
+</IfModule>
+
+<IfModule mod_tls.c>
+    TLSEngine on
+    # TLSLog /var/ftpd/tls.log
+
+    # Support TLSv1, TLSv1.1, and TLSv1.2
+    TLSProtocol TLSv1 TLSv1.1 TLSv1.2
+
+    # Are clients required to use FTP over TLS when talking to this server?
+    TLSRequired off
+
+
+
+    # Server's RSA certificate
+     TLSRSACertificateFile /etc/letsencrypt/live/vclvm178-23.vcl.ncsu.edu/cert.pem
+     TLSRSACertificateKeyFile /etc/letsencrypt/live/vclvm178-23.vcl.ncsu.edu/privkey.pem
+
+
+    # Authenticate clients that want to use FTP over TLS?
+    TLSVerifyClient off
+
+    # Allow SSL/TLS renegotiations when the client requests them, but
+    # do not force the renegotiations.  Some clients do not support
+    # SSL/TLS renegotiations; when mod_tls forces a renegotiation, these
+    # clients will close the data connection, or there will be a timeout
+    # on an idle data connection.
+    TLSRenegotiate none
+
+</IfModule>
+
+# Common SQL authentication options
+SQLEngine                       on
+SQLPasswordEngine               on
+SQLBackend                      postgres
+SQLConnectInfo                  galaxydb@localhost:5432 galaxyftp ftppassword
+SQLAuthenticate                 users
+
+# Set up mod_sql/mod_sql_password - Galaxy passwords are stored as hex-encoded SHA1
+SQLAuthTypes                    SHA1
+SQLPasswordEncoding             hex
+
+
+# Define a custom query for lookup that returns a passwd-like entry. Replace 512s with the UID and GID of the user running the Galaxy server
+SQLUserInfo                     custom:/LookupGalaxyUser
+SQLNamedQuery                   LookupGalaxyUser SELECT "email,password,58413,58413,'/icarbon_temp_10tb/database/files/%U','/bin/bash' FROM galaxy_user WHERE email='%U'"
+
 
 ```
 
