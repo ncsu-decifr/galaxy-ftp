@@ -52,6 +52,7 @@ galaxydb=#
 
 ```
 Copy config to /usr/local/etc/proftpd.conf
+To start the server run sudo ./proftpd in the install directory.
 
 ```
 # Basics, some site-specific
